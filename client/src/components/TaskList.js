@@ -8,7 +8,19 @@ export default function TaskList() {
         const response = await fetch('http://localhost:4000/tasks')
         const data = await response.json()
         setTasks(data)
-    }
+    };
+
+    const handleDelete = async (id) => {
+        try {
+            await fetch(`http://localhost:4000/tasks/${id}`, {
+                method: "DELETE",
+            })
+            setTasks(tasks.filter((task) => task.id !== id));
+
+        } catch (error) {
+            console.log(error)
+        }
+    };
     
     useEffect(() => {
         loadTasks()
@@ -20,24 +32,26 @@ export default function TaskList() {
             {tasks.map((task) =>(
                     <Card style={{
                         marginBottom: ".7rem",
-                        backgroundColor: "#dcdcfc"}}>
+                        backgroundColor: "#dcdcfc",}}
+                        key={task.id}>
                         <CardContent style={{
                             display: "flex",
                             justifyContent: "space-between"
                         }}>
                         <div>
-                            <Typography>{task.title}</Typography>
-                            <Typography>{task.description}</Typography>
+                            <Typography>id: {task.id}</Typography>
+                            <Typography>Title: {task.title}</Typography>
+                            <Typography>Description: {task.description}</Typography>
                         </div>
                         <div>
                             <Button variant='contained' color='inherit'
                                 onClick={() => console.log("edit")}>
-                                Edit
+                                    Edit
                             </Button>
                             <Button variant='contained' color='warning'
-                                onClick={() => console.log("delete")}
+                                onClick={() => handleDelete(task.id)}
                                 style={{marginLeft: ".5rem"}}>
-                                Delete
+                                    Delete
                             </Button>
                         </div>
                         </CardContent>
