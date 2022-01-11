@@ -8,7 +8,7 @@ import {
     Typography
 } from '@mui/material';
 import {useState, useEffect} from "react"
-import {useNavigate} from 'react-router-dom'
+import {useNavigate, useParams} from 'react-router-dom'
 
 export default function TaskForm() {
 
@@ -17,29 +17,49 @@ export default function TaskForm() {
         description: '',
     });
     const [loading, setLoading] = useState(false)
+    const [editing, setEditing] = useState(false)
 
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const params = useParams();
     
     //se guarda el input al hacer submit
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
 
-        setLoading(true)
-
-        const res = await fetch('http://localhost:4000/tasks', {
-            method: 'POST',
-            body: JSON.stringify(task),
-            headers: { "Content-Type": "application/json"},
-        });
-        const data = await res.json()
-        
+        if (editing) {
+            const response = await fetch(`http://localhost:4000/tasks/${params.id}`,{
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(task),
+            });
+        } else {
+            await fetch('http://localhost:4000/tasks', {
+                method: "POST",
+                body: JSON.stringify(task),
+                headers: { "Content-Type": "application/json" },
+            });
+        }
         setLoading(false);
-        navigate('/')
+        navigate("/")
     };
 
     //se captura input de campos title y description en un evento y se imprime en consola
     const handleChange = (e) => 
         setTask({...task, [e.target.name]: e.target.value});
+
+    const loadTask = async (id) => {
+        const res = await fetch(`http://localhost:4000/tasks/${id}`)
+        const data = await res.json()
+        setTask({title: data.title, description: data.description})
+        setEditing(true)
+    };
+
+    useEffect(() => {
+        if(params.id) {
+            loadTask(params.id);
+        };
+    }, [params.id])
     
     return (
         <Grid 
@@ -59,7 +79,7 @@ export default function TaskForm() {
                         textAlign='center'
                         color='white'
                     >
-                        Create Task
+                        {editing ? "Edit Task" : "Create Task"}
                     </Typography>
                     <CardContent>
                         <form onSubmit={handleSubmit}>
@@ -72,6 +92,7 @@ export default function TaskForm() {
                                 }}
 
                                 name="title"
+                                value={task.title}
                                 onChange={handleChange}
                                 inputProps={{ style: { color: "white" } }}
                                 InputLabelProps={{ style: { color: "white" } }}
@@ -88,6 +109,7 @@ export default function TaskForm() {
                                 }}
 
                                 name="description" 
+                                value={task.description}
                                 onChange={handleChange}                               
                                 inputProps={{ style: { color: "white" } }}
                                 InputLabelProps={{ style: { color: "white" } }}
@@ -97,7 +119,7 @@ export default function TaskForm() {
                             disabled={!task.title || !task.description}>
                                 {loading ? (<CircularProgress
                                     color="inherit"
-                                    size={24}/>) : ("Create")}
+                                    size={24}/>) : ("SAVE")}
                             </Button>
 
                         </form>
