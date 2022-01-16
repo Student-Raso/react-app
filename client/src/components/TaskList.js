@@ -23,7 +23,8 @@ export default function TaskList() {
             console.log(error)
         }
     };
-    
+
+    //primero que se ejecuta cuando se selecciona el componente en la app
     useEffect(() => {
         loadTasks()
     }, []);

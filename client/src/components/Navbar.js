@@ -27,6 +27,12 @@ export default function Navbar() {
                         >
                         New Task
                         </Button>
+                        <Button 
+                        variant='contained' 
+                        color='primary' 
+                        onClick={()=>navigate("/tasks/counter")}>
+                        Counter
+                        </Button>
                     </Toolbar>
                 </Container>
             </AppBar>
